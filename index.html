@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080a09">
+  <title>JLdbx — Editor</title>
+  <style>
+    :root {
+      --bg: #080a09;
+      --panel: #101512;
+      --green: #00ff91;
+      --muted: #a6b3aa;
+      --white: #f4fff8;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--white);
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(0,255,145,.12), transparent 45%),
+        var(--bg);
+      font-family: Inter, Arial, sans-serif;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed; inset: 0;
+      pointer-events: none;
+      opacity: .13;
+      background-image: linear-gradient(rgba(0,255,145,.09) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(0,255,145,.09) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, black, transparent 85%);
+    }
+    .wrap { width: min(1080px, 92%); margin: auto; position: relative; }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 25px 0;
+    }
+    .logo { color: var(--green); font-weight: 900; letter-spacing: 2px; font-size: 1.1rem; }
+    .tag { color: var(--muted); font-size: .85rem; letter-spacing: 2px; text-transform: uppercase; }
+    .hero {
+      min-height: 76vh; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; text-align: center;
+      padding: 70px 0 90px;
+    }
+    .pill {
+      border: 1px solid rgba(0,255,145,.35); border-radius: 99px;
+      color: var(--green); padding: 9px 15px; font-size: .78rem;
+      letter-spacing: 2px; text-transform: uppercase;
+      background: rgba(0,255,145,.06);
+      animation: fadeUp .8s ease both;
+    }
+    h1 {
+      font-size: clamp(3.5rem, 12vw, 7.8rem); line-height: .95;
+      letter-spacing: -5px; margin: 24px 0 18px; font-weight: 950;
+      text-shadow: 0 0 28px rgba(0,255,145,.22);
+      animation: fadeUp .8s .1s ease both;
+    }
+    h1 span { color: var(--green); }
+    .intro {
+      max-width: 600px; color: var(--muted); font-size: clamp(1rem, 2vw, 1.2rem);
+      line-height: 1.7; margin: 0 auto 30px; animation: fadeUp .8s .2s ease both;
+    }
+    .actions { display: flex; gap: 13px; flex-wrap: wrap; justify-content: center; animation: fadeUp .8s .3s ease both; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 14px 22px; border-radius: 12px; text-decoration: none;
+      font-weight: 800; transition: transform .2s, box-shadow .2s, background .2s;
+    }
+    .btn:hover { transform: translateY(-4px); }
+    .primary { background: var(--green); color: #04130b; box-shadow: 0 0 25px rgba(0,255,145,.18); }
+    .primary:hover { box-shadow: 0 0 38px rgba(0,255,145,.4); }
+    .secondary { color: var(--white); border: 1px solid #2b3930; background: #101512; }
+    section { padding: 35px 0 85px; }
+    .section-label { color: var(--green); font-size: .78rem; letter-spacing: 3px; text-transform: uppercase; }
+    h2 { font-size: clamp(2rem, 5vw, 3.3rem); margin: 12px 0; letter-spacing: -1.5px; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; }
+    .card {
+      padding: 25px; min-height: 175px; border-radius: 18px;
+      border: 1px solid #202b24; background: linear-gradient(145deg, rgba(20,29,23,.95), rgba(10,13,11,.95));
+      transition: transform .25s, border-color .25s;
+    }
+    .card:hover { transform: translateY(-5px); border-color: rgba(0,255,145,.55); }
+    .card .num { color: var(--green); font-size: .8rem; letter-spacing: 2px; }
+    .card h3 { font-size: 1.25rem; margin: 18px 0 8px; }
+    .card p { color: var(--muted); line-height: 1.6; margin: 0; }
+    .cta {
+      border: 1px solid rgba(0,255,145,.25); border-radius: 22px; padding: 35px;
+      background: radial-gradient(ellipse at 100% 0%, rgba(0,255,145,.12), transparent 55%), #0d120f;
+      display: flex; justify-content: space-between; align-items: center; gap: 25px; flex-wrap: wrap;
+    }
+    .cta p { color: var(--muted); margin-bottom: 0; }
+    footer { padding: 25px 0 35px; color: #718078; border-top: 1px solid #1b241e; font-size: .85rem; }
+    .glow { animation: pulse 3s ease-in-out infinite; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%,100% { text-shadow: 0 0 18px rgba(0,255,145,.18); } 50% { text-shadow: 0 0 40px rgba(0,255,145,.55); } }
+    @media (max-width: 700px) {
+      .cards { grid-template-columns: 1fr; }
+      h1 { letter-spacing: -2px; }
+      .tag { display: none; }
+      .cta { padding: 25px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <div class="logo">JLdbx<span style="color:white">.</span></div>
+    <div class="tag">Video editor / Creator</div>
+  </header>
+
+  <main>
+    <section class="hero wrap">
+      <div class="pill">Independent video editor</div>
+      <h1 class="glow">I MAKE<br><span>EDITS.</span></h1>
+      <p class="intro">Привет! Я JLdbx — создаю эдиты, экспериментирую с эффектами и превращаю обычные моменты в яркие видео.</p>
+      <div class="actions">
+        <!-- ЗАМЕНИ YOUR_USERNAME на свой ник TikTok без символа @ -->
+        <a class="btn primary" href="https://www.tiktok.com/@jldbx1" target="_blank" rel="noopener noreferrer">▶ Мой TikTok</a>
+        <a class="btn secondary" href="#about">Обо мне ↓</a>
+      </div>
+    </section>
+
+    <section class="wrap" id="about">
+      <div class="section-label">01 / About</div>
+      <h2>Мой стиль. Мои правила.</h2>
+      <div class="cards">
+        <article class="card">
+          <div class="num">01 — VISUALS</div>
+          <h3>Эффекты и визуал</h3>
+          <p>Плавные переходы, свечение, динамика и внимание к деталям.</p>
+        </article>
+        <article class="card">
+          <div class="num">02 — ENERGY</div>
+          <h3>Ритм и атмосфера</h3>
+          <p>Монтаж, который подчёркивает музыку и настроение момента.</p>
+        </article>
+        <article class="card">
+          <div class="num">03 — NEXT LEVEL</div>
+          <h3>Постоянный рост</h3>
+          <p>Изучаю новые приёмы и каждый раз стараюсь сделать лучше.</p>
+        </article>
+      </div>
+    </section>
+
+
+    <section class="wrap" id="software">
+      <div class="section-label">03 / My software</div>
+      <h2>Tools I use.</h2>
+      <p style="color: var(--muted); line-height: 1.7; max-width: 620px;">
+        Программы, в которых я создаю свои эдиты.
+      </p>
+      <div class="cards">
+        <article class="card software-card">
+          <div class="num">VIDEO EDITOR / 01</div>
+          <h3>YouCut</h3>
+          <p>Монтаж видео, переходы и эффекты для эдитов.</p>
+        </article>
+        <article class="card software-card">
+          <div class="num">VIDEO EDITOR / 02</div>
+          <h3>CapCut</h3>
+          <p>Эффекты, анимации и работа с видео.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="wrap">
+      <div class="cta">
+        <div>
+          <div class="section-label">02 / Follow</div>
+          <h2>Увидимся в TikTok.</h2>
+          <p>Загляни в мой профиль, чтобы посмотреть мои видео.</p>
+        </div>
+        <a class="btn primary" href="https://www.tiktok.com/@jldbx1" target="_blank" rel="noopener noreferrer">Открыть TikTok ↗</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">© 2026 JLdbx. Сделано с ⚡ и кофе.</div>
+  </footer>
+</body>
+</html>
